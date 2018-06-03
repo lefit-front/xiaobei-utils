@@ -7,7 +7,7 @@ import globby from 'globby'
 // import commonjs from 'rollup-plugin-commonjs';
 // import {uglify} from 'rollup-plugin-uglify';
 
-let configs = globby.sync('./src/plugins/**/*.js').map(inputFile => {
+let configs = globby.sync('./src/plugins/**/index.js').map(inputFile => {
   let result = inputFile.match(/([^/]*)\/([^/]*)\.js$/)
   return {
     input: inputFile,
