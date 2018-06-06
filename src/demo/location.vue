@@ -3,6 +3,7 @@
 </template>
 <script>
   import Location from '../plugins/location'
+  import loadJsBridge from '../plugins/jsbridge/loadJsBridge.js'
   export default {
     data () {
       return {
@@ -10,8 +11,13 @@
       }
     },
     created () {
-      console.log(Location)
-      this.location = new Location()
+      loadJsBridge().then(() => {
+        this.location = new Location()
+        this.location.getLocation().then(res => {
+          console.log(res, 234)
+        })
+        window.locationData = this.location
+      })
     }
   }
 </script>
