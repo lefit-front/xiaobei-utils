@@ -4,8 +4,9 @@ import css from 'rollup-plugin-css-only';
 import globby from 'globby'
 // import buble from 'rollup-plugin-buble';
 // import nodeResolve from 'rollup-plugin-node-resolve';
-// import commonjs from 'rollup-plugin-commonjs';
+import commonjs from 'rollup-plugin-commonjs';
 // import {uglify} from 'rollup-plugin-uglify';
+
 
 let configs = globby.sync('./src/plugins/**/index.js').map(inputFile => {
   let result = inputFile.match(/([^/]*)\/([^/]*)\.js$/)
@@ -20,14 +21,14 @@ let configs = globby.sync('./src/plugins/**/index.js').map(inputFile => {
       css(),
       // buble(),
       // nodeResolve({ browser: true, jsnext: true, main: true }),
-      // commonjs(),
-      // uglify(),
+      commonjs(),
       babel({
         exclude: 'node_modules/**',
         plugins: ['external-helpers'],
         externalHelpers: true,
         runtimeHelpers: true
-      })
+      }),
+      // uglify()
     ]
   }
 })

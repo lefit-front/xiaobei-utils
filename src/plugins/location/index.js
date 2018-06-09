@@ -1,6 +1,7 @@
+import JSONP from './jsonp'
+import { getCookie } from './fit-tool-lite';
 class Location {
   constructor (config) {
-    // this.getFitCity()
     this.init(config || {})
     if (this.type === 'amap') {
       this.loadAMap().then(() => {
@@ -8,20 +9,20 @@ class Location {
         this.initAMap()
         this.installGeoLocation()
       })
-    } else if (this.type === 'wechat') {
-      this.loadAMap().then(() => {
-        this.amapLoaded = true
-        this.initAMap()
-        this.installGeocoder()
-      })      
     }
   }
   init (config) {
     this.map = null
+    this.breakReTry = typeof config.breakReTry === 'number' ? config.breakReTry : 0
     this.geolocation = null
     this.amapLoaded = false
+    this.locationSucc = false
+    this.defaultPosition = {
+      cityId: 2,
+      cityName: '北京市'
+    }
     this.getLocation = async () => {
-      if (!this.amapLoaded) {
+      if (!this.amapLoaded && this.type === 'amap') {
         await new Promise((resolve, reject) => {
           let timer = setInterval(() => {
             if (this.amapLoaded) {
@@ -32,6 +33,11 @@ class Location {
           }, 100)
         })
       }
+      // let fitCity = JSON.parse(getCookie('fit-city') || '{}')
+      // console.log(fitCity)
+      // if (fitCity.name) {
+
+      // }
       return this._getLocation()
     }
     this.type = config.type || ''
@@ -43,6 +49,9 @@ class Location {
       this.type = 'amap'
     }
   }
+  // getCityCache () {
+
+  // }
   async _getLocation () {
     try {
       switch (this.type) {
@@ -58,7 +67,7 @@ class Location {
           this.lng = Number(resWeChat.longitude)
           this.lat = Number(resWeChat.latitude)
           await this.getFitCity([this.lng, this.lat])
-          await this.location2AddressAMap(this.cityName, [this.lng, this.lat])
+          await this.location2AddressQQ(this.lng, this.lat)
           break
         case 'app':
         // ios端已做纠偏处理
@@ -67,10 +76,18 @@ class Location {
           this.lat = Number(resApp.latitude)
           await this.getFitCity([this.lng, this.lat])
       }
+      this.locationSucc = true
       return this
     } catch (err) {
       console.log('_getLocation执行错误' + err)
-      return null
+      this.locationSucc = false
+      if (this.breakReTry > 0) {
+        console.log('重试定位...', this.breakReTry)
+        this.breakReTry--
+        return this._getLocation()
+      } else {
+        return this
+      }
     }
   }
   getFitCity (location) { // 获取乐刻场地城市
@@ -80,7 +97,6 @@ class Location {
       xhr.setRequestHeader('content-type', 'application/json')
       xhr.send(JSON.stringify({
         location: location[0] + ',' + location[1]
-        // location: '116.397428,39.90923'
       }))
       xhr.onreadystatechange = () => {
         if (xhr.status === 200) {
@@ -93,6 +109,8 @@ class Location {
               this.provinceId = res.data.regeo.province_id
               this.isOpenCity = res.data.regeo.is_open_city
               resolve(true)
+            } else{
+              reject(false)
             }
           }
         } else {
@@ -163,8 +181,27 @@ class Location {
       })
     })
   }
-  location2AddressQQ () { // 根据经纬度获取地址名称 (腾讯接口)
-    // http://apis.map.qq.com/ws/geocoder/v1/?location=39.984154,116.307490&key=EBSBZ-DLYL3-25M3I-YNBVA-MN5RS-EZBJK&get_poi=0&poi_options=policy=1
+  location2AddressQQ (lng, lat) { // 根据经纬度获取地址名称 (腾讯接口)
+    return new Promise((resolve, reject) => {
+      JSONP({
+        url: 'https://apis.map.qq.com/ws/geocoder/v1/',
+        data: {
+          location: lat + ',' + lng,
+          key: 'EBSBZ-DLYL3-25M3I-YNBVA-MN5RS-EZBJK',
+          get_poi: 0,
+          poi_options: 'policy=1',
+          output: 'jsonp'
+        },
+        callback: (data) => {
+          if (data.status === 0) {
+            this.address = data.result.address
+            resolve(true)
+          } else {
+            reject(false)
+          }
+        }
+      })
+    })
   }
   loadAMap () {
     return new Promise((resolve, reject) => {
@@ -195,13 +232,14 @@ class Location {
     })
   }
   installGeoLocation () {
+    let isHttp = window.location.protocol === 'http:'
     this.map.plugin('AMap.Geolocation', () => {
       this.geolocation = new AMap.Geolocation({
         enableHighAccuracy: true, // 是否使用高精度定位，默认:true
         timeout: 10000, // 超过10秒后停止定位，默认：无穷大
         noGeoLocation: 0, // 0: 可以使用浏览器定位 1: 手机设备禁止使用浏览器定位 2: PC上禁止使用浏览器定位 3: 所有终端禁止使用浏览器定位
         noIpLocate: 1, //是否禁止使用IP定位，默认值为0，可选值0-3 0: 可以使用IP定位 1: 手机设备禁止使用IP定位 2: PC上禁止使用IP定位 3: 所有终端禁止使用IP定位
-        GeoLocationFirst: true, // 默认为false，设置为true的时候可以调整PC端为优先使用浏览器定位，失败后使用IP定位
+        GeoLocationFirst: !isHttp, // 默认为false，设置为true的时候可以调整PC端为优先使用浏览器定位，失败后使用IP定位
         convert: true, // 是否使用坐标偏移，取值true:为高德地图坐标，取值false:为浏览器定位坐标
         extensions: 'base'
       })

@@ -13,11 +13,6 @@
   详情看以下函数入参注解
 */
 class UpAdmin{
-  uptoken = ''
-  formData = null
-  file = null
-  tagTime = 0
-  config = {}
   /**
    * Creates an instance of UpAdmin.
    * @param {any} Qiniu 七牛sdk
@@ -25,6 +20,11 @@ class UpAdmin{
    * @memberof UpAdmin
    */
   constructor(Qiniu, config) {
+    this.uptoken = ''
+    this.formData = null
+    this.file = null
+    this.tagTime = 0
+    this.config = {}
     if (Qiniu) {
       this.config = Object.assign(defaultConfig, config || {})
       let me = this

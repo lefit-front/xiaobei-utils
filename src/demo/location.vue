@@ -12,7 +12,9 @@
     },
     created () {
       loadJsBridge().then(() => {
-        this.location = new Location()
+        this.location = new Location({
+          breakReTry: 1
+        })
         this.location.getLocation().then(res => {
           console.log(res, 234)
         })
