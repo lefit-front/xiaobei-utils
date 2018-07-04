@@ -1,5 +1,5 @@
 import JSONP from './jsonp'
-import { getCookie } from './fit-tool-lite';
+import { getCookie, setCookieDomain } from './fit-tool-lite';
 class Location {
   constructor (config) {
     this.init(config || {})
@@ -14,9 +14,10 @@ class Location {
   init (config) {
     this.map = null
     this.breakReTry = typeof config.breakReTry === 'number' ? config.breakReTry : 0
+    this.needRefresh = Boolean(config.needRefresh)
     this.geolocation = null
     this.amapLoaded = false
-    this.locationSucc = false
+    this.success = false
     this.defaultPosition = {
       cityId: 2,
       cityName: '北京市'
@@ -33,11 +34,17 @@ class Location {
           }, 100)
         })
       }
-      // let fitCity = JSON.parse(getCookie('fit-city') || '{}')
-      // console.log(fitCity)
-      // if (fitCity.name) {
-
-      // }
+      if (!this.needRefresh) {
+        let fitCity = JSON.parse(getCookie('fit-city') || '{}')
+        if (fitCity.success) {
+          this.success = true
+          this.cityId = fitCity.id
+          this.cityName = fitCity.name
+          this.lng = Number(getCookie('fit-lng')) || null
+          this.lat = Number(getCookie('fit-lat')) || null
+          return this
+        }
+      }
       return this._getLocation()
     }
     this.type = config.type || ''
@@ -49,9 +56,6 @@ class Location {
       this.type = 'amap'
     }
   }
-  // getCityCache () {
-
-  // }
   async _getLocation () {
     try {
       switch (this.type) {
@@ -76,11 +80,18 @@ class Location {
           this.lat = Number(resApp.latitude)
           await this.getFitCity([this.lng, this.lat])
       }
-      this.locationSucc = true
+      this.success = true
+      setCookieDomain('fit-city', JSON.stringify({
+        id: this.cityId,
+        name: this.cityName,
+        success: true
+      }), 600)
+      setCookieDomain('fit-lat', this.lat, 600)
+      setCookieDomain('fit-lng', this.lng, 600)
       return this
-    } catch (err) {
+    } catch (err) { 
       console.log('_getLocation执行错误' + err)
-      this.locationSucc = false
+      this.success = false
       if (this.breakReTry > 0) {
         console.log('重试定位...', this.breakReTry)
         this.breakReTry--
@@ -232,14 +243,14 @@ class Location {
     })
   }
   installGeoLocation () {
-    let isHttp = window.location.protocol === 'http:'
+    let isHttps = window.location.protocol === 'https:'
     this.map.plugin('AMap.Geolocation', () => {
       this.geolocation = new AMap.Geolocation({
         enableHighAccuracy: true, // 是否使用高精度定位，默认:true
         timeout: 10000, // 超过10秒后停止定位，默认：无穷大
         noGeoLocation: 0, // 0: 可以使用浏览器定位 1: 手机设备禁止使用浏览器定位 2: PC上禁止使用浏览器定位 3: 所有终端禁止使用浏览器定位
         noIpLocate: 1, //是否禁止使用IP定位，默认值为0，可选值0-3 0: 可以使用IP定位 1: 手机设备禁止使用IP定位 2: PC上禁止使用IP定位 3: 所有终端禁止使用IP定位
-        GeoLocationFirst: !isHttp, // 默认为false，设置为true的时候可以调整PC端为优先使用浏览器定位，失败后使用IP定位
+        GeoLocationFirst: isHttps, // 默认为false，设置为true的时候可以调整PC端为优先使用浏览器定位，失败后使用IP定位
         convert: true, // 是否使用坐标偏移，取值true:为高德地图坐标，取值false:为浏览器定位坐标
         extensions: 'base'
       })
@@ -256,3 +267,8 @@ class Location {
 }
 
 export default Location
+
+
+// 使用注意:
+// 1 手动引入jsbriage
+// 2 ios在网络代理的情况下会出现获取定位失败

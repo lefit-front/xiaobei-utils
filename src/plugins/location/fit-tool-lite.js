@@ -7,3 +7,6 @@ export function getCookie (name) {
     return null
   }
 }
+export function setCookieDomain (cName, value, maxAge) {
+  document.cookie = cName + '=' + escape(value) + ((maxAge === null) ? '' : ';max-age=' + maxAge) + ';path=/;domain=leoao.com'
+}

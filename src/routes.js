@@ -4,6 +4,7 @@ import ImgBlur from './demo/img-blur.vue'
 import UpAdmin from './demo/up-admin'
 import Jsbridge from './demo/jsbridge.vue'
 import Location from './demo/location.vue'
+import Cans from './demo/cans.vue'
 import App from './app'
 
 export default {
@@ -35,5 +36,9 @@ export default {
     path: '/location',
     name: 'location',
     component: Location
+  }, {
+    path: '/cans',
+    name: 'cans',
+    component: Cans
   }]
 }

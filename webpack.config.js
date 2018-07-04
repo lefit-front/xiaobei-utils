@@ -92,6 +92,7 @@ module.exports = {
     overlay: true,
     port: 8025,
     host: '0.0.0.0',
+    disableHostCheck: true,
     proxy: {
       '/lens': {
         target: 'https://test-node-lens.leoao.com',
