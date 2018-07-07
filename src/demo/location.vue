@@ -17,6 +17,7 @@
         })
         this.location.getLocation().then(res => {
           console.log(res, 234)
+          window.alert(JSON.stringify(res))
         })
         window.locationData = this.location
       })

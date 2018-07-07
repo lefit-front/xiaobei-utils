@@ -70,8 +70,10 @@ class Location {
           let resWeChat = await this.wechatLocation()
           this.lng = Number(resWeChat.longitude)
           this.lat = Number(resWeChat.latitude)
-          await this.getFitCity([this.lng, this.lat])
-          await this.location2AddressQQ(this.lng, this.lat)
+          await Promise.all([
+            this.getFitCity([this.lng, this.lat]),
+            this.location2AddressQQ(this.lng, this.lat)
+          ])
           break
         case 'app':
         // ios端已做纠偏处理
@@ -198,7 +200,7 @@ class Location {
         url: 'https://apis.map.qq.com/ws/geocoder/v1/',
         data: {
           location: lat + ',' + lng,
-          key: 'EBSBZ-DLYL3-25M3I-YNBVA-MN5RS-EZBJK',
+          key: 'OD5BZ-OBFK6-BWUSA-MWJO6-XCXF7-5AFIV',
           get_poi: 0,
           poi_options: 'policy=1',
           output: 'jsonp'
