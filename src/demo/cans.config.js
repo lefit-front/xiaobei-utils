@@ -9,6 +9,9 @@ export default {
       y: 0,
       width: 550,
       height: 633,
+      async callback (cans) {
+        await cans.drawImage('https://cdn.leoao.com/experice-rule/rank_1.png', 160, 1146, 102, 30)
+      }
     },
     {
       source: 'https://img.leoao.com/o_1b4aqahi9cof1fgnqrs1dedkscp.jpg',
@@ -45,7 +48,10 @@ export default {
       letterSpacing: '20px',
       color: '#000',
       x: 150,
-      y: 1200
+      y: 1200,
+      callback (cans, data) {
+        console.log(cans, data)
+      }
     },
     {
       text: '自动换行 + 行高测试 自动换行 + 行高测试 自动换行 + 行高测试 自动换行 + 行高测试 自动换行 + 行高测试 自动换行 + 行高测试 自动换行 + 行高测试 自动换行 + 行高测试 自动换行 + 行高测试 ',
@@ -82,7 +88,10 @@ export default {
       ey: 750,
       lineWidth: 10,
       color: 'red',
-      style: 'solid'
+      style: 'solid',
+      callback (cans) {
+        console.log(cans)
+      }
     },
     {
       sx: 750,

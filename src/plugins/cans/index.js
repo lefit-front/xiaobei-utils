@@ -1,18 +1,17 @@
 import Cansf from './cansf'
 class Cans extends Cansf{
-  constructor (config, canvas) {
-    const { width, height, background } = config
-    super({
-      width,
-      height
-    }, canvas)
-    this.setBackground(background)
-    this.resolveImages(config.images).then(() => {
-      this.resolveTexts(config.texts)
-      this.resolveLines(config.lines)
-    })
+  constructor (canvas) {
+    super(canvas)
   }
-  setBackground (background) {
+  async render (config) {
+    this.setCanvas(config)
+    await this.resolveImages(config.images)
+    this.resolveTexts(config.texts)
+    this.resolveLines(config.lines)
+  }
+  setCanvas ({background, width, height}) {
+    width && (this.canvas.width = width)
+    height && (this.canvas.height = height)
     this.ctx.fillStyle = background
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
   }
@@ -25,7 +24,9 @@ class Cans extends Cansf{
         v.ey,
         v.lineWidth,
         v.color,
-        v.style
+        v.style,
+        v.shadow,
+        v.callback
       )
     })
   }
@@ -44,7 +45,8 @@ class Cans extends Cansf{
           width: v.width,
           textAlign: v.textAlign,
           lineHeight: v.lineHeight,
-          shadow: v.shadow
+          shadow: v.shadow,
+          callback: v.callback
         }
       )
     })
@@ -57,7 +59,7 @@ class Cans extends Cansf{
         console.log('图片加载失败 无法渲染: ' + images[index].source)
         return null
       }
-      const {x, y, width, height, border, shadow, borderRadius} = images[index]
+      const {x, y, width, height, border, shadow, borderRadius, callback} = images[index]
       return await this.drawImage(
         img,
         x,
@@ -67,7 +69,8 @@ class Cans extends Cansf{
         {
           border,
           shadow,
-          borderRadius
+          borderRadius,
+          callback
         }
       )
     })

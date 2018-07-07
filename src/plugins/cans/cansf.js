@@ -6,15 +6,13 @@ const percent2Num = function (v) {
   return ~~v.replace('%', '') / 100
 }
 
-class cansf {
-  constructor (config, canvas) {
+class Cansf {
+  constructor (canvas) {
     this.canvas = canvas || document.createElement('canvas')
     this.ctx = this.canvas.getContext('2d')
-    this.canvas.width = config.width
-    this.canvas.height = config.height
     this.cache = {}
     this.drawImage = async (source, x, y, w, h, props = {}) => {
-      let { border, shadow, borderRadius } = props
+      let { border, shadow, borderRadius, callback } = props
       let bw = 0
       if (shadow) {
         this.setShadow(shadow)
@@ -28,7 +26,7 @@ class cansf {
         this.ctx.lineWidth = bw
         borderStyle === 'dashed' && this.ctx.setLineDash([2, 2])
       }
-      let img = typeof source === 'string' ? await this.getCache(source) : source
+      let img = await this.getCache(source)
       if (borderRadius) {
         let canvas = this.imageRadiusClip(img, borderRadius)
         this.ctx.drawImage(canvas, x, y, w, h)
@@ -37,8 +35,9 @@ class cansf {
         this.ctx.drawImage(img, x, y, w, h)
         bw && this.ctx.strokeRect(x - bw / 2, y - bw / 2, w + bw, h + bw)
       }
+      callback && await callback(this)
     }
-    this.drawLine = (sx, sy, ex, ey, w, color, style, shadow) => {
+    this.drawLine = async (sx, sy, ex, ey, w, color, style, shadow, callback) => {
       if (shadow) {
         this.setShadow(shadow)
       } else {
@@ -51,9 +50,11 @@ class cansf {
       this.ctx.lineTo(ex, ey)
       this.ctx.strokeStyle = color
       this.ctx.stroke()
+      callback && await callback(this)
     }
-    this.drawText = (text, x, y, props = {}) => {
-      let { color = '#000', fontSize = '10px', fontWeight = '', fontStyle = '', letterSpacing = '', width, textAlign, hasBreak = false, lineHeight, shadow} = props
+    this.drawText = async (text, x, y, props = {}) => {
+      let { color = '#000', fontSize = '10px', fontWeight = '', fontStyle = '', letterSpacing = '',
+       width, textAlign, hasBreak = false, lineHeight, shadow, callback} = props
       if (shadow) {
         this.setShadow(shadow)
       } else {
@@ -88,10 +89,9 @@ class cansf {
         }
       }
       this.ctx.fillText(text, x, y + ~~fontSize.replace(/([\d]+)px/, '$1'))
-      return this.ctx.measureText(text)
-    }
-    this.toDataURL = function (...arg) {
-      return this.canvas.toDataURL(...arg)
+      callback && await callback(this, this.ctx.measureText(text))
+      // return this.ctx.measureText(text)
+
     }
     this.reset = () => {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
@@ -121,15 +121,20 @@ class cansf {
       }
     })
   }
-  async getCache (src) {
-    let key = this.isBase64(src) ? src.slice(-18) : src
-    if (!Object.hasOwnProperty(this.cache, key)) {
-      let img = await this.loadImg(src)
-      if (img) {
-        this.cache[key] = img
+  async getCache (source) {
+    if (typeof source === 'string') {
+      let key = this.isBase64(source) ? source.slice(-18) : source
+      if (!Object.hasOwnProperty(this.cache, key)) {
+        let img = await this.loadImg(source)
+        if (img) {
+          this.cache[key] = img
+        }
       }
+      return this.cache[key] || null
+    } else {
+      return source
     }
-    return this.cache[key] || null
+    
   }
   isBase64 (src) {
     return /^data:image\/jpg;base64,/.test(src)
@@ -186,5 +191,12 @@ class cansf {
     this.ctx.shadowBlur = shadowBlur
     this.ctx.shadowColor = shadowColor
   }
+  output (tiny) {
+    if (!tiny) {
+      return this.canvas.toDataURL()
+    } else {
+      return this.canvas.toDataURL('image/jpeg', tiny)
+    }
+  }
 }
-export default cansf
+export default Cansf
