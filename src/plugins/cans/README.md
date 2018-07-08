@@ -276,5 +276,7 @@ export default {
 ```
 
 ## 效果预览:
-<!-- http://cdn.leoao.com/UC20180708_215652.png -->
+
+不知道为什么链接被转了: [ojbk](http://cdn.leoao.com/UC20180708_215652.png)
+
 ![ojbk](http://cdn.leoao.com/UC20180708_215652.png)
