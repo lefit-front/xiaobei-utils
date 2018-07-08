@@ -25,6 +25,7 @@
       this.cans = new Cans()
       await this.cans.render(config)
       this.output = this.cans.output()
+      console.log(this.cans)
     }
   }
 </script>

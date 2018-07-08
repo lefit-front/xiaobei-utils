@@ -2,13 +2,13 @@ import Cansf from './cansf'
 class Cans extends Cansf{
   constructor (canvas) {
     super(canvas)
-  }
-  async render (config) {
-    this.setCanvas(config)
-    await this.resolveImages(config.images)
-    await this.resolveTexts(config.texts)
-    await this.resolveLines(config.lines)
-    return this
+    this.render = async (config) => {
+      this.setCanvas(config)
+      await this.resolveImages(config.images)
+      await this.resolveTexts(config.texts)
+      await this.resolveLines(config.lines)
+      return this
+    }
   }
   setCanvas ({background, width, height}) {
     width && (this.canvas.width = width)
