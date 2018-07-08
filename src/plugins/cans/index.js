@@ -6,8 +6,9 @@ class Cans extends Cansf{
   async render (config) {
     this.setCanvas(config)
     await this.resolveImages(config.images)
-    this.resolveTexts(config.texts)
-    this.resolveLines(config.lines)
+    await this.resolveTexts(config.texts)
+    await this.resolveLines(config.lines)
+    return this
   }
   setCanvas ({background, width, height}) {
     width && (this.canvas.width = width)
@@ -15,52 +16,28 @@ class Cans extends Cansf{
     this.ctx.fillStyle = background
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
   }
-  resolveLines (lines = []) {
-    lines.forEach(v => {
-      this.drawLine(
-        v.sx,
-        v.sy,
-        v.ex,
-        v.ey,
-        v.lineWidth,
-        v.color,
-        v.style,
-        v.shadow,
-        v.callback
-      )
-    })
+  async resolveLines (lines = []) {
+    for (let i = 0; i < lines.length; i++) {
+      let {sx, sy, ex, ey, lineWidth, color, style, shadow, callback} = lines[i]
+      await this.drawLine(sx, sy, ex, ey, lineWidth, color, style, shadow, callback)
+    }
   }
-  resolveTexts (texts = []) {
-    texts.forEach(v => {
-      this.drawText(
-        v.text,
-        v.x,
-        v.y,
-        {
-          fontSize: v.fontSize,
-          fontWeight: v.fontWeight,
-          color: v.color,
-          letterSpacing: v.letterSpacing,
-          fontStyle: v.fontStyle,
-          width: v.width,
-          textAlign: v.textAlign,
-          lineHeight: v.lineHeight,
-          shadow: v.shadow,
-          callback: v.callback
-        }
-      )
-    })
+  async resolveTexts (texts = []) {
+    for (let i = 0; i < texts.length; i++) {
+      let { text, x, y, ...arg } = texts[i]
+      await this.drawText(text, x, y, arg)
+    }
   }
   async resolveImages (images = []) {
     let res = await Promise.all(images.map(v => this.getCache(v.source)))
-    // 下面虽然异步 但实际执行的同步代码
-    res.map(async (img, index) => {
+    for (let i = 0; i < res.length; i++) {
+      let img = res[i]
       if (!img) {
-        console.log('图片加载失败 无法渲染: ' + images[index].source)
-        return null
+        console.log('图片加载失败 无法渲染: ' + images[i].source)
+        break
       }
-      const {x, y, width, height, border, shadow, borderRadius, callback} = images[index]
-      return await this.drawImage(
+      const {x, y, width, height, border, shadow, borderRadius, callback} = images[i]
+      await this.drawImage(
         img,
         x,
         y,
@@ -73,7 +50,7 @@ class Cans extends Cansf{
           callback
         }
       )
-    })
+    }
   }
 }
 

@@ -11,6 +11,7 @@ export default {
       height: 633,
       async callback (cans) {
         await cans.drawImage('https://cdn.leoao.com/experice-rule/rank_1.png', 160, 1146, 102, 30)
+        // 如果想要在render结果返回之前执行 请吧callback写成async函数或返回promise
       }
     },
     {
@@ -67,7 +68,7 @@ export default {
       y: 700
     },
     {
-      text: '居中文案测试 + 斜体 + 阴影',
+      text: '居中 + 斜体 + 阴影',
       fontSize: '56px',
       fontStyle: 'italic',
       fontWeight: 'bold',

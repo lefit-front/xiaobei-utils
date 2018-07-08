@@ -90,7 +90,6 @@ class Cansf {
       }
       this.ctx.fillText(text, x, y + ~~fontSize.replace(/([\d]+)px/, '$1'))
       callback && await callback(this, this.ctx.measureText(text))
-      // return this.ctx.measureText(text)
 
     }
     this.reset = () => {

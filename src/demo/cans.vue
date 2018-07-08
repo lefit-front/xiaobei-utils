@@ -25,8 +25,6 @@
       this.cans = new Cans()
       await this.cans.render(config)
       this.output = this.cans.output()
-      window.cans = this.cans
-      this.$el.appendChild(this.cans.canvas)
     }
   }
 </script>
