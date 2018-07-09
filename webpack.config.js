@@ -4,7 +4,7 @@ var webpack = require('webpack')
 module.exports = {
   entry: './src/main.js',
   output: {
-    path: path.resolve(__dirname, './dist'),
+    path: path.resolve(__dirname, './static'),
     publicPath: '/dist/',
     filename: 'build.js'
   },
@@ -32,6 +32,14 @@ module.exports = {
           'css-loader',
           'sass-loader?indentedSyntax'
         ],
+      },
+      {
+        test: /le-ui.src.*?js$/,
+        loader: 'babel-loader'
+      },
+      {
+        test: /lefit.src.*?js$/,
+        loader: 'babel-loader'
       },
       {
         test: /\.vue$/,
