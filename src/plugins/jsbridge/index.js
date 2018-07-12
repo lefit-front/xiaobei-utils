@@ -1,8 +1,5 @@
 import {isApp} from '../fit-tool-lite'
 import loadJsBridge from './loadJsBridge'
-let cbList = []
-let loaded = false
-let firstEntry = true
 
 const funHander = function (operate, name, ...arg) {
   if (!isApp()) {
@@ -10,25 +7,9 @@ const funHander = function (operate, name, ...arg) {
   } else if (loaded && window.LeFitWebViewJavascriptBridge) {
     window.LeFitWebViewJavascriptBridge[operate](name, ...arg)
   } else {
-    if (!firstEntry) {
-      cbList.push({name, arg: arg, operate})
-    } else {
-      firstEntry = false
-      loadJsBridge().then((res) => {
-        loaded = true
-        window.LeFitWebViewJavascriptBridge[operate](name, ...arg)
-        console.log(cbList)
-        if (cbList.length) {
-          cbList.forEach(({operate, name, arg}) => {
-            window.LeFitWebViewJavascriptBridge[operate](name, ...arg)
-          })
-          cbList = []
-        }
-      }).catch(err => {
-        loaded = true
-        console.log(err)
-      })
-    }
+    loadJsBridge(function () {
+      window.LeFitWebViewJavascriptBridge[operate](name, ...arg)
+    })
   }
 }
 
@@ -46,5 +27,6 @@ export default {
         }
       }
     })
+    loadJsBridge()
   }
 }

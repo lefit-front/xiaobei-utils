@@ -6,8 +6,12 @@
   </div>
 </template>
 <script>
+  import Vue from 'vue'
   import Location from '../plugins/location'
-  import loadJsBridge from '../plugins/jsbridge/loadJsBridge.js'
+  import jsbridge from '../plugins/jsbridge'
+  import weChat from '../plugins/wechat'
+  Vue.use(jsbridge)
+  Vue.use(weChat)
   export default {
     data () {
       return {
@@ -26,15 +30,13 @@
       }
     },
     created () {
-      loadJsBridge().then(() => {
-        this.location = new Location({
-          breakReTry: 1
-        })
-        this.location.getLocation().then(res => {
-          console.log(res, 234)
-        })
-        window.locationData = this.location
+      this.location = new Location({
+        breakReTry: 1
       })
+      this.location.getLocation().then(res => {
+        console.log(res, 234)
+      })
+      window.locationData = this.location
     }
   }
 </script>

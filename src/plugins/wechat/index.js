@@ -13,56 +13,42 @@ const _wx = new Proxy(wx, {
       return wx[name]
     } else {
       return function (...arg) {
-        if (!firstEntry) {
-          cbList.push({name, arg: arg})
-        } else {
-          firstEntry = false
-          loadWx().then((res) => {
-            loaded = true
-            wx[name](...arg)
-            if (cbList.length) {
-              cbList.forEach(({name, arg}) => {
-                arg = arg || {}
-                wx[name](...arg)
-              })
-              cbList = []
-            }
-          }).catch(err => {
-            loaded = true
-            console.log(err)
-          })
-        }
+        loadWx(() => wx[name](...arg)).catch((err) => console.log(err) )
       }
     }
   }
 })
-export default {
-  install (Vue) {
-    Object.defineProperty(Vue.prototype, '$wx', {
-      value: _wx
-    })
-    Object.defineProperty(window, 'wx', {
-      value: _wx
-    })
-  }
-}
 
-async function loadWx() {
-  let res = await requestJsbill()
-  wx.config({
-    debug: false,
-    appId: res.data.appId,
-    timestamp: res.data.timestamp,
-    nonceStr: res.data.nonceStr,
-    signature: res.data.signature,
-    jsApiList: [
-      'checkJsApi', 'openLocation', 'getLocation', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'hideMenuItems', 'uploadImage', 'chooseImage', 'scanQRCode', 'chooseWXPay'
-    ]
-  })
-  await new Promise((resolve, reject) => {
-    wx.ready(() => resolve())
-    wx.error(() => reject())
-  })
+async function loadWx(callback = () => {}) {
+  if (!isWeChat()) {
+    return true
+  }
+  if (!firstEntry) {
+    cbList.push(callback)
+  } else {
+    firstEntry = false
+    let res = await requestJsbill()
+    wx.config({
+      debug: false,
+      appId: res.data.appId,
+      timestamp: res.data.timestamp,
+      nonceStr: res.data.nonceStr,
+      signature: res.data.signature,
+      jsApiList: [
+        'checkJsApi', 'openLocation', 'getLocation', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'hideMenuItems', 'uploadImage', 'chooseImage', 'scanQRCode', 'chooseWXPay'
+      ]
+    })
+    await new Promise((resolve, reject) => {
+      wx.ready(() => resolve())
+      wx.error((err) => resolve(err))
+    })
+    loaded = true
+    callback()
+    if (cbList.length) {
+      cbList.forEach(cb => cb())
+      cbList = []
+    }
+  }
 }
 function requestJsbill () {
   return new Promise((resolve, reject) => {
@@ -77,4 +63,16 @@ function requestJsbill () {
       }
     }
   })
+}
+
+export default {
+  install (Vue) {
+    Object.defineProperty(Vue.prototype, '$wx', {
+      value: _wx
+    })
+    Object.defineProperty(window, 'wx', {
+      value: _wx
+    })
+    loadWx().catch((err) => console.log(err) )
+  }
 }
