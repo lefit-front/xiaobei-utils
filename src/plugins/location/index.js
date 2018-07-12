@@ -245,14 +245,13 @@ class Location {
     })
   }
   installGeoLocation () {
-    let isHttps = window.location.protocol === 'https:'
     this.map.plugin('AMap.Geolocation', () => {
       this.geolocation = new AMap.Geolocation({
         enableHighAccuracy: true, // 是否使用高精度定位，默认:true
         timeout: 10000, // 超过10秒后停止定位，默认：无穷大
         noGeoLocation: 0, // 0: 可以使用浏览器定位 1: 手机设备禁止使用浏览器定位 2: PC上禁止使用浏览器定位 3: 所有终端禁止使用浏览器定位
-        noIpLocate: 1, //是否禁止使用IP定位，默认值为0，可选值0-3 0: 可以使用IP定位 1: 手机设备禁止使用IP定位 2: PC上禁止使用IP定位 3: 所有终端禁止使用IP定位
-        GeoLocationFirst: isHttps, // 默认为false，设置为true的时候可以调整PC端为优先使用浏览器定位，失败后使用IP定位
+        noIpLocate: 0, //是否禁止使用IP定位，默认值为0，可选值0-3 0: 可以使用IP定位 1: 手机设备禁止使用IP定位 2: PC上禁止使用IP定位 3: 所有终端禁止使用IP定位
+        GeoLocationFirst: true, // 默认为false，设置为true的时候可以调整PC端为优先使用浏览器定位，失败后使用IP定位
         convert: true, // 是否使用坐标偏移，取值true:为高德地图坐标，取值false:为浏览器定位坐标
         extensions: 'base'
       })

@@ -1,5 +1,9 @@
 <template>
-  <div></div>
+  <div>
+    <p v-for="(val, key) in location" :key="key">
+      <b>{{key}}</b> <span>{{format(val)}}</span>
+    </p>
+  </div>
 </template>
 <script>
   import Location from '../plugins/location'
@@ -7,7 +11,18 @@
   export default {
     data () {
       return {
-        location
+        location: {}
+      }
+    },
+    methods: {
+      format (val) {
+        if (val === null || val === undefined) return 'null'
+        try {
+          return JSON.stringify(val)
+        } catch (err) {
+          console.log(val)
+          return val.toString()
+        }
       }
     },
     created () {
@@ -17,7 +32,6 @@
         })
         this.location.getLocation().then(res => {
           console.log(res, 234)
-          window.alert(JSON.stringify(res))
         })
         window.locationData = this.location
       })

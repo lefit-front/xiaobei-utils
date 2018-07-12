@@ -16,14 +16,11 @@ export default {
     path: '/up-admin',
     name: 'up-admin',
     component: UpAdmin
-  },
-  // 待moment插件完善后再放出
-  //  {
-  //   path: '/le-date-picker',
-  //   name: 'le-date-picker',
-  //   component: leDatePicker
-  // },
-  {
+  }, {
+    path: '/le-date-picker',
+    name: 'le-date-picker',
+    component: leDatePicker
+  }, {
     path: '/img-blur',
     name: 'img-blur',
     component: ImgBlur

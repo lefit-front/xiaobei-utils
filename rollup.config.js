@@ -2,10 +2,7 @@ import babel from 'rollup-plugin-babel'
 import vue from 'rollup-plugin-vue2';
 import css from 'rollup-plugin-css-only';
 import globby from 'globby'
-// import buble from 'rollup-plugin-buble';
-// import nodeResolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-// import {uglify} from 'rollup-plugin-uglify';
 
 
 let configs = globby.sync('./src/plugins/**/index.js').map(inputFile => {
@@ -19,8 +16,6 @@ let configs = globby.sync('./src/plugins/**/index.js').map(inputFile => {
     plugins: [
       vue(),
       css(),
-      // buble(),
-      // nodeResolve({ browser: true, jsnext: true, main: true }),
       commonjs(),
       babel({
         exclude: 'node_modules/**',
@@ -28,7 +23,6 @@ let configs = globby.sync('./src/plugins/**/index.js').map(inputFile => {
         externalHelpers: true,
         runtimeHelpers: true
       }),
-      // uglify()
     ]
   }
 })
