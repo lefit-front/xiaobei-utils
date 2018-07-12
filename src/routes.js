@@ -5,6 +5,7 @@ import UpAdmin from './demo/up-admin'
 import Jsbridge from './demo/jsbridge.vue'
 import Location from './demo/location.vue'
 import Cans from './demo/cans.vue'
+import Wechat from './demo/wechat.vue'
 import App from './app'
 
 export default {
@@ -40,5 +41,9 @@ export default {
     path: '/cans',
     name: 'cans',
     component: Cans
+  }, {
+    path: '/wechat',
+    name: 'wechat',
+    component: Wechat
   }]
 }

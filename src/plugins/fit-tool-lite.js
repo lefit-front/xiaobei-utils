@@ -10,3 +10,9 @@ export function getCookie (name) {
 export function setCookieDomain (cName, value, maxAge) {
   document.cookie = cName + '=' + escape(value) + ((maxAge === null) ? '' : ';max-age=' + maxAge) + ';path=/;domain=leoao.com'
 }
+export function isWeChat () {
+  return window.navigator.userAgent.toLowerCase().indexOf('micromessenger') > -1
+}
+export function isApp () {
+  return !!window.navigator.userAgent.match('LEFIT')
+}

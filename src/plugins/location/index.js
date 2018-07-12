@@ -1,5 +1,5 @@
 import JSONP from './jsonp'
-import { getCookie, setCookieDomain } from './fit-tool-lite';
+import { getCookie, setCookieDomain } from '../fit-tool-lite'
 class Location {
   constructor (config) {
     this.init(config || {})
