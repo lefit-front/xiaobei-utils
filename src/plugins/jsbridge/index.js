@@ -4,7 +4,7 @@ import loadJsBridge from './loadJsBridge'
 const funHander = function (operate, name, ...arg) {
   if (!isApp()) {
     console.log('当前不是app环境 无法执行操作')
-  } else if (loaded && window.LeFitWebViewJavascriptBridge) {
+  } else if (window.LeFitWebViewJavascriptBridge) {
     window.LeFitWebViewJavascriptBridge[operate](name, ...arg)
   } else {
     loadJsBridge(function () {
@@ -28,5 +28,6 @@ export default {
       }
     })
     loadJsBridge()
-  }
+  },
+  init: loadJsBridge
 }
