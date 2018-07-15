@@ -61,7 +61,6 @@ export default {
       fontFamily: '',
       lineHeight: '36px',
       textAlign: 'left',
-      letterSpacing: '5px',
       color: '#000',
       width: 375,
       x: 100,

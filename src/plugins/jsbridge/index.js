@@ -8,6 +8,7 @@ const funHander = function (operate, name, ...arg) {
     window.LeFitWebViewJavascriptBridge[operate](name, ...arg)
   } else {
     loadJsBridge(function () {
+      console.log(window.LeFitWebViewJavascriptBridge, 11)
       window.LeFitWebViewJavascriptBridge[operate](name, ...arg)
     })
   }

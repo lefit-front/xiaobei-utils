@@ -60,7 +60,7 @@ class Cansf {
       } else {
         this.setShadow('0 0 0 transparent')
       }
-      this.canvas.style.letterSpacing = letterSpacing ?  letterSpacing : '0px'
+      // this.canvas.style.letterSpacing = letterSpacing ?  letterSpacing : '0px'
       this.ctx.font = `${fontStyle} ${fontWeight} ${fontSize} PingFangSC-Regular`
       this.ctx.fillStyle = color
       if (width) {
@@ -88,7 +88,9 @@ class Cansf {
             break
         }
       }
-      this.ctx.fillText(text, x, y + ~~fontSize.replace(/([\d]+)px/, '$1'))
+      letterSpacing
+      ? this.ctx.letterSpacingText(text, x, y + ~~fontSize.replace(/([\d]+)px/, '$1'), ~~px2Num(letterSpacing))
+      : this.ctx.fillText(text, x, y + ~~fontSize.replace(/([\d]+)px/, '$1'))
       callback && await callback(this, this.ctx.measureText(text))
 
     }

@@ -49,4 +49,5 @@ export default async function (callback = () => {}) {
       cbList = []
     }
   }
+  return true
 }

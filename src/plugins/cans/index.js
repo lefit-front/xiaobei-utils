@@ -1,4 +1,5 @@
 import Cansf from './cansf'
+import './letter-spacing'
 class Cans extends Cansf{
   constructor (canvas) {
     super(canvas)

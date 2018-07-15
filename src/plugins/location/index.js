@@ -18,6 +18,7 @@ class Location {
     this.geolocation = null
     this.amapLoaded = false
     this.success = false
+    this.error = null
     this.defaultPosition = {
       cityId: 2,
       cityName: '北京市'
@@ -93,6 +94,7 @@ class Location {
       return this
     } catch (err) { 
       console.log('_getLocation执行错误' + err)
+      this.error = err
       this.success = false
       if (this.breakReTry > 0) {
         console.log('重试定位...', this.breakReTry)
@@ -123,25 +125,25 @@ class Location {
               this.isOpenCity = res.data.regeo.is_open_city
               resolve(true)
             } else{
-              reject(false)
+              reject('getFitCity获取失败')
             }
           }
         } else {
-          reject(false)
+          reject('getFitCity获取失败')
         }
       }
     })
   }
   amapLocation () { // 高德地图定位
     return new Promise((resolve, reject) => {
-      this.geolocation.getCurrentPosition(function (status, res) {
+      this.geolocation.getCurrentPosition((status, res) => {
         if (status === 'complete') {
           resolve(res)
         } else {
           // localhost可以 ip不能绕过
           console.warn(status, res)
           console.log('手动提示:由于Chrome、IOS10等已不再支持非安全域的浏览器定位请求，为保证定位成功率和精度，请尽快升级您的站点到HTTPS。 ')
-          reject()
+          reject(res)
         }
       })
     })
@@ -189,7 +191,7 @@ class Location {
           this.address = result.regeocode && result.regeocode.formattedAddress
           resolve(true)
         } else {
-          reject(false)
+          reject('location2AddressAMap根据经纬度获取地址名称失败')
         }
       })
     })
@@ -210,7 +212,7 @@ class Location {
             this.address = data.result.address
             resolve(true)
           } else {
-            reject(false)
+            reject('location2AddressQQ获取失败')
           }
         }
       })
@@ -273,3 +275,4 @@ export default Location
 // 使用注意:
 // 1 手动引入jsbriage
 // 2 ios在网络代理的情况下会出现获取定位失败
+// https请求中出现http请求会打断定位权限的获取
