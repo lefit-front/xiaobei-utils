@@ -13,7 +13,7 @@ class Location {
   }
   init (config) {
     this.map = null
-    this.breakReTry = typeof config.breakReTry === 'number' ? config.breakReTry : 0
+    this.breakRetry = typeof config.breakRetry === 'number' ? config.breakRetry : 0
     this.needRefresh = Boolean(config.needRefresh)
     this.geolocation = null
     this.amapLoaded = false
@@ -84,6 +84,7 @@ class Location {
           await this.getFitCity([this.lng, this.lat])
       }
       this.success = true
+      this.error = null
       setCookieDomain('fit-city', JSON.stringify({
         id: this.cityId,
         name: this.cityName,
@@ -96,9 +97,9 @@ class Location {
       console.log('_getLocation执行错误' + err)
       this.error = err
       this.success = false
-      if (this.breakReTry > 0) {
-        console.log('重试定位...', this.breakReTry)
-        this.breakReTry--
+      if (this.breakRetry > 0) {
+        console.log('重试定位...', this.breakRetry)
+        this.breakRetry--
         return this._getLocation()
       } else {
         return this
