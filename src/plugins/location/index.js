@@ -4,16 +4,12 @@ class Location {
   constructor (config) {
     this.init(config || {})
     if (this.type === 'amap') {
-      this.loadAMap().then(() => {
-        this.amapLoaded = true
-        this.initAMap()
-        this.installGeoLocation()
-      })
+      this.loadAMap()
     }
   }
   init (config) {
     this.map = null
-    this.breakRetry = typeof config.breakRetry === 'number' ? config.breakRetry : 0
+    this.breakRetry = typeof config.breakRetry === 'number' ? config.breakRetry : 1
     this.needRefresh = Boolean(config.needRefresh)
     this.geolocation = null
     this.amapLoaded = false
@@ -34,6 +30,8 @@ class Location {
             }
           }, 100)
         })
+        this.initAMap()
+        await this.installGeoLocation()
       }
       if (!this.needRefresh) {
         let fitCity = JSON.parse(getCookie('fit-city') || '{}')
@@ -230,10 +228,11 @@ class Location {
         script.defer = true
         script.src = 'https://webapi.amap.com/maps?v=1.3&key=fc4920b8e2e0c77f381607444389d475';
         document.body.appendChild(script)
-        let timer = setInterval(function () {
+        let timer = setInterval(() => {
           if(window.AMap && window.AMap.Map) {
             clearInterval(timer)
             timer = null
+            this.amapLoaded = true
             resolve(true)
           }
         }, 100)
@@ -248,15 +247,18 @@ class Location {
     })
   }
   installGeoLocation () {
-    this.map.plugin('AMap.Geolocation', () => {
-      this.geolocation = new AMap.Geolocation({
-        enableHighAccuracy: true, // 是否使用高精度定位，默认:true
-        timeout: 10000, // 超过10秒后停止定位，默认：无穷大
-        noGeoLocation: 0, // 0: 可以使用浏览器定位 1: 手机设备禁止使用浏览器定位 2: PC上禁止使用浏览器定位 3: 所有终端禁止使用浏览器定位
-        noIpLocate: 0, //是否禁止使用IP定位，默认值为0，可选值0-3 0: 可以使用IP定位 1: 手机设备禁止使用IP定位 2: PC上禁止使用IP定位 3: 所有终端禁止使用IP定位
-        GeoLocationFirst: true, // 默认为false，设置为true的时候可以调整PC端为优先使用浏览器定位，失败后使用IP定位
-        convert: true, // 是否使用坐标偏移，取值true:为高德地图坐标，取值false:为浏览器定位坐标
-        extensions: 'base'
+    return new Promise((resolve) => {
+      this.map.plugin('AMap.Geolocation', () => {
+        this.geolocation = new AMap.Geolocation({
+          enableHighAccuracy: true, // 是否使用高精度定位，默认:true
+          timeout: 10000, // 超过10秒后停止定位，默认：无穷大
+          noGeoLocation: 0, // 0: 可以使用浏览器定位 1: 手机设备禁止使用浏览器定位 2: PC上禁止使用浏览器定位 3: 所有终端禁止使用浏览器定位
+          noIpLocate: 0, //是否禁止使用IP定位，默认值为0，可选值0-3 0: 可以使用IP定位 1: 手机设备禁止使用IP定位 2: PC上禁止使用IP定位 3: 所有终端禁止使用IP定位
+          GeoLocationFirst: true, // 默认为false，设置为true的时候可以调整PC端为优先使用浏览器定位，失败后使用IP定位
+          convert: true, // 是否使用坐标偏移，取值true:为高德地图坐标，取值false:为浏览器定位坐标
+          extensions: 'base'
+        })
+        resolve()
       })
     })
   }
