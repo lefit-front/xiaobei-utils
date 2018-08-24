@@ -78,6 +78,15 @@ export default {
       width: 750,
       x: 0,
       y: 1050
+    },
+    {
+      x: 0,
+      y: 970,
+      // width: 750,
+      fontSize: '36px',
+      color: '#fff',
+      textAlign: 'left',
+      text: '添加店长微信↑↑↑↑'
     }
   ],
   lines: [

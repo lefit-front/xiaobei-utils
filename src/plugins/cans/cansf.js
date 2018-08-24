@@ -54,13 +54,12 @@ class Cansf {
     }
     this.drawText = async (text, x, y, props = {}) => {
       let { color = '#000', fontSize = '10px', fontWeight = '', fontStyle = '', letterSpacing = '',
-       width, textAlign, hasBreak = false, lineHeight, shadow, callback} = props
+       width, textAlign = 'left', hasBreak = false, lineHeight, shadow, callback} = props
       if (shadow) {
         this.setShadow(shadow)
       } else {
         this.setShadow('0 0 0 transparent')
       }
-      // this.canvas.style.letterSpacing = letterSpacing ?  letterSpacing : '0px'
       this.ctx.font = `${fontStyle} ${fontWeight} ${fontSize} PingFangSC-Regular`
       this.ctx.fillStyle = color
       if (width) {
@@ -76,15 +75,16 @@ class Cansf {
           }
         }
       }
-      if (textAlign && width || hasBreak) {
+      if (textAlign) {
+        this.ctx.textAlign = textAlign
+      }
+      if (width || hasBreak) {
         switch (textAlign) {
           case 'right':
             x = x + width
-            this.ctx.textAlign = 'right'
             break
           case 'center':
-            x = (x + width )/ 2
-            this.ctx.textAlign = 'center'
+            x = (x + width) / 2
             break
         }
       }
