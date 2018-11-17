@@ -64,11 +64,12 @@ class Cansf {
       this.ctx.fillStyle = color
       if (width) {
         for (let i = 0; i < text.length; i++) {
-          if (this.ctx.measureText(text.slice(0, i + 1)).width > width) {
+          if (/\n/.test(text[i]) || this.ctx.measureText(text.slice(0, i + 1)).width > width) {
             this.drawText(text.slice(0, i), x, y, {
               ...props,
               hasBreak: true
             })
+            i = /\n/.test(text[i]) ? i + 1 : i
             lineHeight = lineHeight ? px2Num(lineHeight) : px2Num(fontSize)
             this.drawText(text.slice(i), x, y + lineHeight, props)
             return
